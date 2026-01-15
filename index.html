@@ -76,7 +76,7 @@
                     Copy License ID
                 </button>
             </div>
-            <p class="mb-8 text-gray-300">素晴らしい走りだ。次のラウンドへ進むか、記録を塗り替えるかはお前次第だ。</p>
+            <p class="mb-8 text-gray-300">素晴らしい!もっと極めよう!</p>
             <div class="flex flex-col gap-4">
                 <button onclick="quiz.returnToGrid()" class="f1-font bg-white text-black px-12 py-4 rounded-full font-bold tracking-tighter uppercase transition-transform active:scale-95">
                     Select Round
@@ -988,7 +988,7 @@ thoroughly: 徹底的に
                     passArea.classList.remove('hidden');
                     failMsg.classList.add('hidden');
                     
-                    const passId = "VGP-" + Math.random().toString(36).substr(2, 9).toUpperCase();
+                    const passId = "embarrass" ;
                     localStorage.setItem('PASS', passId);
 
                     const copyBtn = document.getElementById('copy-pass-btn');
@@ -1029,3 +1029,4 @@ thoroughly: 徹底的に
 </body>
 
 </html>
+
