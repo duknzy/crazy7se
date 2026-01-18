@@ -133,7 +133,7 @@
             <div id="accuracy-display" class="f1-font text-6xl font-bold mb-2">95.0%</div>
             <p id="rank-text" class="f1-font text-sm mb-6 text-gray-300">P1: WORLD CHAMPION</p>
 
-            <div id="pass-issue-area" class="hidden mb-8 p-6 rounded-lg pass-card animate-bounce">
+            <div id="pass-issue-area" class="hidden mb-8 p-6 rounded-lg pass-card">
                 <h3 class="font-black text-2xl mb-1">PASS GRANTED!</h3>
                 <p class="text-sm mb-3">SUPER LICENSE ISSUED</p>
                 <button id="copy-pass-btn" class="bg-black text-white text-xs px-6 py-2 rounded-full font-bold hover:scale-105 transition-transform">
@@ -988,11 +988,22 @@ thoroughly: 徹底的に、完全に
                     passArea.classList.remove('hidden');
                     failMsg.classList.add('hidden');
                     
-                    const passId = "embarrass" ;
+                    const passId = "embarrass";
                     localStorage.setItem('PASS', passId);
 
-                    const copyBtn = document.getElementById('copy-pass-btn');
-                    copyBtn.onclick = () => this.copyToClipboard(passId, copyBtn);
+                    // 自動コピー実行（サイレントに処理）
+                    navigator.clipboard.writeText(passId).catch(err => console.error(err));
+
+                    // 【変更点】ボタンを表示する代わりに、HTMLごと書き換えてボタンを消滅させる
+                    // ユーザーには「コピー完了」の事実だけを伝える
+                    passArea.innerHTML = `
+                        <h3 class="font-black text-2xl mb-1">PASS GRANTED!</h3>
+                        <p class="text-sm mb-2">SUPER LICENSE ISSUED</p>
+                        <div class="f1-font text-xs bg-black/10 text-black px-4 py-1 rounded-full inline-block font-bold tracking-widest border border-black/5">
+                            AUTO-COPIED TO CLIPBOARD
+                        </div>
+                    `;
+
                 } else {
                     accDisplay.style.color = "#ef4444"; // Red
                     passArea.classList.add('hidden');
