@@ -69,13 +69,10 @@
         <div id="champion-screen" class="hidden race-card p-10 rounded-lg shadow-2xl text-center border-4 border-yellow-500">
             <h1 class="f1-font text-5xl mb-6 font-bold text-yellow-500 tracking-widest">SEASON CHAMPION</h1>
             <div class="pass-card p-6 rounded-lg mb-8">
-                <p class="f1-font text-sm uppercase font-bold mb-2">Access Granted</p>
-                <h2 class="text-3xl font-black">SUPER LICENSE PASS</h2>
-                <p id="pass-id" class="mt-4 font-mono text-xs opacity-75"></p>
-                <button id="copy-existing-pass" class="mt-4 bg-black/20 hover:bg-black/40 text-black text-xs px-4 py-2 rounded-full font-bold transition-all">
-                    Copy License ID
-                </button>
-            </div>
+    <p class="f1-font text-sm uppercase font-bold mb-2">Access Granted</p>
+    <h2 class="text-3xl font-black">SUPER LICENSE PASS</h2>
+    <p class="mt-4 font-mono text-xs opacity-75">VALID FOR 2026 SEASON</p>
+</div>
             <p class="mb-8 text-gray-300">素晴らしい!もっと極めよう!</p>
             <div class="flex flex-col gap-4">
                 <button onclick="quiz.returnToGrid()" class="f1-font bg-white text-black px-12 py-4 rounded-full font-bold tracking-tighter uppercase transition-transform active:scale-95">
@@ -845,14 +842,11 @@ thoroughly: 徹底的に、完全に
                 if (savedPass) {
                     document.getElementById('start-screen').classList.add('hidden');
                     document.getElementById('champion-screen').classList.remove('hidden');
-                    document.getElementById('pass-id').innerText = `LICENSE_ID: ${savedPass}`;
                     
-                    document.getElementById('copy-existing-pass').onclick = () => {
-                        this.copyToClipboard(savedPass, document.getElementById('copy-existing-pass'));
-                    };
+                    // 【削除】 ここにあった pass-id への代入と、ボタンの onclick 設定をすべて削除した
+                    // チャンピオン画面を表示するだけで十分だ
                 }
             }
-
             copyToClipboard(text, btnElement) {
                 navigator.clipboard.writeText(text).then(() => {
                     const originalText = btnElement.innerText;
@@ -998,7 +992,7 @@ thoroughly: 徹底的に、完全に
                     // ユーザーには「コピー完了」の事実だけを伝える
                     passArea.innerHTML = `
                         <h3 class="font-black text-2xl mb-1">PASS GRANTED!</h3>
-                        <p class="text-sm mb-2">SUPER LICENSE ISSUED</p>
+                        <p class="text-sm mb-2"> LICENSE ISSUED</p>
                         <div class="f1-font text-xs bg-black/10 text-black px-4 py-1 rounded-full inline-block font-bold tracking-widest border border-black/5">
                             AUTO-COPIED TO CLIPBOARD
                         </div>
