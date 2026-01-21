@@ -224,6 +224,9 @@
             <div class="bg-black/30 p-4 rounded mb-8 text-left max-h-48 overflow-y-auto border border-gray-800" id="review-list"></div>
 
             <div class="flex gap-4 justify-center">
+                <button id="next-round-btn" class="hidden f1-font bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-full font-bold transition-all shadow-lg shadow-red-900/50">
+                    NEXT ROUND
+                </button>
                 <button onclick="quiz.returnToGrid()" class="f1-font border-2 border-white hover:bg-white hover:text-black text-white px-8 py-3 rounded-full font-bold transition-all">
                     Back to Garage
                 </button>
@@ -232,9 +235,6 @@
     </div>
 
     <script>
-// ==========================================
-// PASTE YOUR 2000 WORDS HERE
-// ==========================================
 const rawData = `
 follow: ～の後に続く、～に従う
 consider: ～を考慮する
@@ -2300,10 +2300,7 @@ lest: ～しないように
 
             loadVoices() {
                 const allVoices = this.synth.getVoices();
-                
-                // 英語(en)で始まるボイスだけを抽出して、優先順位をつける
                 this.englishVoices = allVoices.filter(v => v.lang.startsWith('en'));
-                
                 this.englishVoices.sort((a, b) => {
                     const getScore = (voice) => {
                         if (voice.name.includes('Google US')) return 100;
@@ -2314,14 +2311,12 @@ lest: ～しないように
                     };
                     return getScore(b) - getScore(a); 
                 });
-
                 console.log("English Voices Loaded:", this.englishVoices);
             }
 
             restoreStats(current, max) {
                 this.currentStreak = current || 0;
                 this.userMaxStreak = max || 0;
-                
                 const streakDisp = document.getElementById('streak-display');
                 if (this.currentStreak >= 2) {
                     streakDisp.innerText = `COMBO: ${this.currentStreak}`;
@@ -2361,7 +2356,6 @@ lest: ～しないように
                     const startNum = currentWordIndex;
                     const chunk = wordCopy.splice(0, this.wordsPerRound);
                     const endNum = startNum + chunk.length - 1;
-                    
                     if (chunk.length > 0) {
                         this.rounds.push({
                             id: roundNum,
@@ -2377,7 +2371,6 @@ lest: ～しないように
             createCustomRound() {
                 const startInput = document.getElementById('custom-start');
                 const endInput = document.getElementById('custom-end');
-                
                 const start = parseInt(startInput.value) - 1; 
                 const end = parseInt(endInput.value);
 
@@ -2387,7 +2380,6 @@ lest: ～しないように
                 }
 
                 const customWords = this.masterList.slice(start, end);
-                
                 const customRound = {
                     id: 'custom',
                     name: `CUSTOM [No.${start + 1} - ${end}]`,
@@ -2426,32 +2418,23 @@ lest: ～しないように
             speak(text) {
                 if (!this.synth) return;
                 this.synth.cancel();
-
-                if (this.englishVoices.length === 0) {
-                    this.loadVoices();
-                }
+                if (this.englishVoices.length === 0) this.loadVoices();
 
                 const utterance = new SpeechSynthesisUtterance(text);
-                
-                // 最優先の英語ボイスを強制指定
                 if (this.englishVoices.length > 0) {
                     utterance.voice = this.englishVoices[0];
                     utterance.lang = this.englishVoices[0].lang;
                 } else {
                     utterance.lang = 'en-US';
                 }
-
-                utterance.rate = 1.3; // Speed
+                utterance.rate = 1.25; 
                 utterance.volume = 1.0; 
 
                 const btn = document.getElementById('speak-btn');
                 if(btn) {
                     btn.classList.add('speaking');
-                    utterance.onend = () => {
-                        btn.classList.remove('speaking');
-                    };
+                    utterance.onend = () => { btn.classList.remove('speaking'); };
                 }
-
                 this.synth.speak(utterance);
             }
 
@@ -2513,31 +2496,20 @@ lest: ～しないように
                 const speakBtn = document.getElementById('speak-btn');
                 speakBtn.onclick = () => this.speak(q.w);
 
-                setTimeout(() => {
-                    this.speak(q.w);
-                }, 300);
+                setTimeout(() => { this.speak(q.w); }, 300);
 
                 const container = document.getElementById('options-container');
                 container.innerHTML = ''; 
 
                 const revealBtn = document.createElement('button');
                 revealBtn.className = 'col-span-1 md:col-span-2 w-full h-32 bg-gray-900/50 border-2 border-dashed border-gray-600 rounded text-gray-400 f1-font text-xl uppercase tracking-widest hover:border-yellow-500 hover:text-yellow-500 transition-all flex flex-col items-center justify-center gap-2 animate-pulse';
-                revealBtn.innerHTML = `
-                    <span class="text-3xl">🤔</span>
-                    <span>VISUALIZE MEANING</span>
-                    <span class="text-xs text-gray-500 font-mono">TAP TO UNLOCK DRS</span>
-                `;
-                
-                revealBtn.onclick = () => {
-                    this.renderOptions(q, container);
-                };
-                
+                revealBtn.innerHTML = `<span class="text-3xl">🤔</span><span>VISUALIZE MEANING</span><span class="text-xs text-gray-500 font-mono">TAP TO UNLOCK DRS</span>`;
+                revealBtn.onclick = () => { this.renderOptions(q, container); };
                 container.appendChild(revealBtn);
             }
 
             renderOptions(q, container) {
                 container.innerHTML = '';
-
                 q.o.forEach(option => {
                     const btn = document.createElement('button');
                     btn.className = 'option-btn w-full text-left p-6 rounded bg-white/5 border border-white/10 hover:border-red-500 font-bold text-lg md:text-xl shadow-lg';
@@ -2563,7 +2535,6 @@ lest: ～しないように
                         void streakDisp.offsetWidth;
                         streakDisp.classList.add('animate-pulse');
                     }
-
                     this.currentIndex++;
                     if (this.currentIndex < this.questions.length) {
                         this.showQuestion();
@@ -2573,7 +2544,6 @@ lest: ～しないように
                 } else {
                     this.currentStreak = 0;
                     streakDisp.classList.add('hidden');
-
                     if (window.saveUserStreak) window.saveUserStreak(0, this.userMaxStreak);
 
                     this.missCount++;
@@ -2584,10 +2554,8 @@ lest: ～しないように
                         this.missedWordsLog.push({ w: questionObj.w, m: questionObj.m });
                     }
                     this.questions.push(questionObj);
-                    
                     const btns = document.querySelectorAll('.option-btn');
                     btns.forEach(b => b.disabled = true);
-                    
                     setTimeout(() => {
                         this.currentIndex++;
                         this.showQuestion();
@@ -2610,16 +2578,17 @@ lest: ～しないように
                 const passArea = document.getElementById('pass-issue-area');
                 const failMsg = document.getElementById('fail-message');
 
+                // Firebase Sync
                 if (window.recordLapTime) {
                     const roundName = this.rounds[this.currentRoundIndex].name;
                     const correctCount = roundLen - this.missCount;
                     const scoreString = `${correctCount}/${roundLen}`;
                     window.recordLapTime(accuracy, totalTime, roundName, scoreString, this.roundMaxStreak);
                 }
-                
                 if (window.saveUserStreak) window.saveUserStreak(this.currentStreak, this.userMaxStreak);
                 if (window.incrementDailyLaps) window.incrementDailyLaps();
 
+                // UI Update
                 if (accuracy >= 90) {
                     accDisplay.style.color = "#4ade80"; 
                     passArea.classList.remove('hidden');
@@ -2627,12 +2596,7 @@ lest: ～しないように
                     const passId = "embarrass";
                     localStorage.setItem('PASS', passId);
                     navigator.clipboard.writeText(passId).catch(err => console.error(err));
-                    passArea.innerHTML = `
-                        <h3 class="font-black text-2xl mb-1">PASS GRANTED!</h3>
-                        <p class="text-sm mb-2"> LICENSE ISSUED</p>
-                        <div class="f1-font text-xs bg-black/10 text-black px-4 py-1 rounded-full inline-block font-bold tracking-widest border border-black/5">
-                            AUTO-COPIED TO CLIPBOARD
-                        </div>`;
+                    passArea.innerHTML = `<h3 class="font-black text-2xl mb-1">PASS GRANTED!</h3><p class="text-sm mb-2"> LICENSE ISSUED</p><div class="f1-font text-xs bg-black/10 text-black px-4 py-1 rounded-full inline-block font-bold tracking-widest border border-black/5">AUTO-COPIED TO CLIPBOARD</div>`;
                 } else {
                     accDisplay.style.color = "#ef4444"; 
                     passArea.classList.add('hidden');
@@ -2648,6 +2612,23 @@ lest: ～しないように
                     summaryHtml += '<p class="text-green-500 font-bold">Perfect Lap. No Issues Detected.</p>';
                 }
                 review.innerHTML = summaryHtml;
+
+                // ★NEXT ROUND BUTTON LOGIC (Option B: Standard Only)
+                const nextBtn = document.getElementById('next-round-btn');
+                const currentRoundObj = this.rounds[this.currentRoundIndex];
+                
+                // 次のラウンドが存在し、かつ現在のラウンドがカスタム(id="custom")でない場合のみ表示
+                if (currentRoundObj.id !== 'custom' && this.currentRoundIndex + 1 < this.rounds.length) {
+                    nextBtn.classList.remove('hidden');
+                    nextBtn.onclick = () => {
+                        // プルダウンを次のラウンドに進める
+                        document.getElementById('round-selector').value = this.currentRoundIndex + 1;
+                        // スタート
+                        this.start();
+                    };
+                } else {
+                    nextBtn.classList.add('hidden');
+                }
             }
 
             returnToGrid() {
@@ -2706,7 +2687,6 @@ lest: ～しないように
             loginBtn.classList.add('hidden');
             userSection.classList.remove('hidden');
             userNameSpan.textContent = user.displayName || "Unknown Driver";
-            
             try {
                 const userDoc = await getDoc(doc(db, "users", user.uid));
                 if (userDoc.exists()) {
@@ -2716,7 +2696,6 @@ lest: ～しないように
                     window.quiz.restoreStats(0, 0);
                 }
             } catch (e) { console.error("Stats Load Error", e); }
-            
             updateLeaderboard(); 
         } else {
             currentUser = null;
@@ -2760,7 +2739,6 @@ lest: ～しないように
       window.incrementDailyLaps = async () => {
         const statsRef = doc(db, "stats", "daily_global");
         const todayStr = getTodayStr();
-
         try {
             await runTransaction(db, async (transaction) => {
                 const sfDoc = await transaction.get(statsRef);
@@ -2775,10 +2753,7 @@ lest: ～しないように
                     }
                 }
             });
-            console.log("Track Activity Updated.");
-        } catch (e) {
-            console.error("Counter Error:", e);
-        }
+        } catch (e) { console.error("Counter Error:", e); }
       };
 
       const statsRef = doc(db, "stats", "daily_global");
