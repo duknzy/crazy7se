@@ -2445,7 +2445,18 @@ lest: ～しないように
                     selector.appendChild(opt);
                 });
             }
-
+// ★追加: コピー機能のパーツ
+            copyToClipboard(text, btnElement) {
+                navigator.clipboard.writeText(text).then(() => {
+                    const originalText = btnElement.innerText;
+                    btnElement.innerText = "COPIED!";
+                    btnElement.classList.add("bg-green-600", "border-green-600"); 
+                    setTimeout(() => { 
+                        btnElement.innerText = originalText; 
+                        btnElement.classList.remove("bg-green-600", "border-green-600");
+                    }, 2000);
+                });
+            }
             speak(text) {
                 if (!this.synth) return;
                 this.synth.cancel();
@@ -2559,15 +2570,51 @@ lest: ～しないように
                 const accuracy = (1 - (this.missCount / this.questions.length)) * 100;
                 document.getElementById('accuracy-display').innerText = this.isPitStopMode ? "SRS UPDATED" : `${accuracy.toFixed(1)}%`;
                 
+                // Telemetry Recording
                 if (!this.isPitStopMode && window.recordLapTime && window.currentUser) {
                     const roundName = this.rounds[this.currentRoundIndex].name;
                     const correct = Math.max(0, this.rounds[this.currentRoundIndex].words.length - this.missCount);
                     window.recordLapTime(accuracy, totalTime, roundName, `${correct}/${this.rounds[this.currentRoundIndex].words.length}`, this.roundMaxStreak);
                 }
+                
+                // SRS & Stats
                 if (window.fetchSRSItems) window.fetchSRSItems();
                 if (window.incrementDailyLaps && !this.isPitStopMode) window.incrementDailyLaps();
 
+                // UI Updates
+                const passArea = document.getElementById('pass-issue-area');
+                const failMsg = document.getElementById('fail-message');
+                const accDisplay = document.getElementById('accuracy-display');
+
+                if (!this.isPitStopMode) {
+                    if (accuracy >= 90) {
+                        // === PASSED ===
+                        accDisplay.style.color = "#4ade80"; 
+                        passArea.classList.remove('hidden');
+                        failMsg.classList.add('hidden');
+                        
+                        // ★修正: コピーボタンに機能をセット
+                        const passBtn = document.getElementById('copy-pass-btn');
+                        passBtn.onclick = () => {
+                            const licenseId = `LICENSE-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
+                            this.copyToClipboard(licenseId, passBtn);
+                        };
+                    } else {
+                        // === FAILED ===
+                        accDisplay.style.color = "#ef4444"; 
+                        passArea.classList.add('hidden');
+                        failMsg.classList.remove('hidden');
+                    }
+                } else {
+                    // === PIT STOP MODE ===
+                    passArea.classList.add('hidden');
+                    failMsg.classList.add('hidden');
+                    accDisplay.style.color = "#fbbf24"; 
+                }
+
                 document.getElementById('rank-text').innerText = `Time: ${totalTime.toFixed(2)}s | Misses: ${this.missCount}`;
+                
+                // Review List
                 const review = document.getElementById('review-list');
                 let summaryHtml = `<div class="mb-4 font-bold text-white uppercase text-sm tracking-widest border-b border-gray-700 pb-2">Technical Telemetry</div>`;
                 if (this.missedWordsLog.length > 0) {
@@ -2576,6 +2623,7 @@ lest: ～しないように
                 } else { summaryHtml += '<p class="text-green-500 font-bold">Perfect Lap.</p>'; }
                 review.innerHTML = summaryHtml;
 
+                // Next Button Logic
                 const nextBtn = document.getElementById('next-round-btn');
                 if (!this.isPitStopMode && this.rounds[this.currentRoundIndex].id !== 'custom' && this.currentRoundIndex + 1 < this.rounds.length) {
                     nextBtn.classList.remove('hidden');
