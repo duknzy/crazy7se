@@ -2468,17 +2468,22 @@ initSearch() {
                     }
 
                     // Scan Master List (Limit to 100 hits for speed)
-                    const hits = this.masterList.filter(item => 
-                        item.w.toLowerCase().includes(q) || item.m.toLowerCase().includes(q)
-                    ).slice(0, 100);
+                    // ★修正: 元の番号(index + 1)を保持したまま検索する
+                    const hits = this.masterList
+                        .map((item, index) => ({ ...item, i: index + 1 })) // カーナンバー(i)を付与
+                        .filter(item => item.w.toLowerCase().includes(q) || item.m.toLowerCase().includes(q))
+                        .slice(0, 100);
 
                     if (hits.length > 0) {
                         results.classList.remove('hidden');
                         results.innerHTML = hits.map(h => `
                             <div onclick="quiz.speak('${h.w.replace(/'/g, "\\'")}')" class="p-3 border-b border-gray-800 hover:bg-gray-800 cursor-pointer flex justify-between items-center group transition-colors">
-                                <div>
-                                    <span class="text-red-400 font-bold block text-sm f1-font">${h.w}</span>
-                                    <span class="text-gray-400 text-xs">${h.m}</span>
+                                <div class="flex flex-col text-left">
+                                    <div class="flex items-baseline gap-2">
+                                        <span class="text-[10px] text-yellow-500 font-mono opacity-70">No.${h.i}</span>
+                                        <span class="text-red-400 font-bold text-sm f1-font">${h.w}</span>
+                                    </div>
+                                    <span class="text-gray-400 text-xs pl-1">${h.m}</span>
                                 </div>
                                 <button class="text-[10px] bg-gray-700 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity uppercase font-bold">Listen</button>
                             </div>
@@ -2488,6 +2493,14 @@ initSearch() {
                         results.innerHTML = `<div class="p-3 text-gray-500 text-xs text-center font-mono">NO DATA FOUND</div>`;
                     }
                 });
+
+                // Hide results when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!input.contains(e.target) && !results.contains(e.target)) {
+                        results.classList.add('hidden');
+                    }
+                });
+            }
 
                 // Hide results when clicking outside
                 document.addEventListener('click', (e) => {
