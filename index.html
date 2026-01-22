@@ -2500,21 +2500,7 @@ lest: ～しないように
                     }
                 });
             }
-                // Hide results when clicking outside
-                document.addEventListener('click', (e) => {
-                    if (!input.contains(e.target) && !results.contains(e.target)) {
-                        results.classList.add('hidden');
-                    }
-                });
-            }
-
-                // Hide results when clicking outside
-                document.addEventListener('click', (e) => {
-                    if (!input.contains(e.target) && !results.contains(e.target)) {
-                        results.classList.add('hidden');
-                    }
-                });
-            }
+            
             copyToClipboard(text, btnElement) {
                 navigator.clipboard.writeText(text).then(() => {
                     const originalText = btnElement.innerText;
