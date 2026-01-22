@@ -155,7 +155,17 @@
                 </button>
                 <p class="text-[10px] text-red-400 mt-1 uppercase tracking-wider">Mechanical Failures Detected</p>
             </div>
-
+<div class="mb-6 bg-gray-800/50 p-3 rounded border border-gray-600 text-left relative group">
+                <label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">QUICK SEARCH (WORD / MEANING)</label>
+                <div class="flex items-center relative">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500 absolute left-3 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                    
+                    <input type="text" id="search-input" placeholder="Type to scan database..." class="w-full bg-black text-white py-2 pl-9 pr-2 rounded border border-gray-700 focus:border-red-500 outline-none font-mono text-sm placeholder-gray-700 transition-colors">
+                </div>
+                
+                <div id="search-results" class="hidden absolute z-50 left-0 w-full mt-1 bg-gray-900 border border-gray-700 rounded shadow-2xl max-h-60 overflow-y-auto">
+                    </div>
+            </div>
             <div class="mb-6 bg-gray-800/50 p-4 rounded border border-gray-600 text-left">
                 <label class="text-xs text-gray-400 uppercase tracking-widest block mb-2">CUSTOM TEST RANGE (WORD #)</label>
                 <div class="flex gap-2 items-center">
@@ -2329,6 +2339,7 @@ lest: ～しないように
                 this.parseData();
                 this.generateRounds();
                 this.initUI();
+                this.initSearch(); 
             }
 
             loadVoices() {
@@ -2445,7 +2456,46 @@ lest: ～しないように
                     selector.appendChild(opt);
                 });
             }
-// ★追加: コピー機能のパーツ
+initSearch() {
+                const input = document.getElementById('search-input');
+                const results = document.getElementById('search-results');
+
+                input.addEventListener('input', (e) => {
+                    const q = e.target.value.toLowerCase().trim();
+                    if (!q) { 
+                        results.classList.add('hidden'); 
+                        return; 
+                    }
+
+                    // Scan Master List (Limit to 100 hits for speed)
+                    const hits = this.masterList.filter(item => 
+                        item.w.toLowerCase().includes(q) || item.m.toLowerCase().includes(q)
+                    ).slice(0, 100);
+
+                    if (hits.length > 0) {
+                        results.classList.remove('hidden');
+                        results.innerHTML = hits.map(h => `
+                            <div onclick="quiz.speak('${h.w.replace(/'/g, "\\'")}')" class="p-3 border-b border-gray-800 hover:bg-gray-800 cursor-pointer flex justify-between items-center group transition-colors">
+                                <div>
+                                    <span class="text-red-400 font-bold block text-sm f1-font">${h.w}</span>
+                                    <span class="text-gray-400 text-xs">${h.m}</span>
+                                </div>
+                                <button class="text-[10px] bg-gray-700 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity uppercase font-bold">Listen</button>
+                            </div>
+                        `).join('');
+                    } else {
+                        results.classList.remove('hidden');
+                        results.innerHTML = `<div class="p-3 text-gray-500 text-xs text-center font-mono">NO DATA FOUND</div>`;
+                    }
+                });
+
+                // Hide results when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!input.contains(e.target) && !results.contains(e.target)) {
+                        results.classList.add('hidden');
+                    }
+                });
+            }
             copyToClipboard(text, btnElement) {
                 navigator.clipboard.writeText(text).then(() => {
                     const originalText = btnElement.innerText;
