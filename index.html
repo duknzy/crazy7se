@@ -2,7 +2,11 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no">
+    
     <title>Vocabulary GP - 2026 SRS Spec</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -12,6 +16,16 @@
             background-color: #0b0e14;
             color: #e2e8f0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* Safe Area for iPhone X+ */
+            padding-top: max(2rem, env(safe-area-inset-top));
+            padding-bottom: max(2rem, env(safe-area-inset-bottom));
+            padding-left: max(1rem, env(safe-area-inset-left));
+            padding-right: max(1rem, env(safe-area-inset-right));
+        }
+
+        /* Mobile Touch Optimization */
+        button, input, select, a {
+            touch-action: manipulation;
         }
 
         .f1-font {
@@ -21,6 +35,18 @@
         .race-card {
             background: linear-gradient(145deg, #1a1f2e, #111521);
             border-left: 4px solid #e10600;
+        }
+        
+        /* Mobile Card Adjustment */
+        @media (max-width: 640px) {
+            .race-card {
+                padding: 1.5rem !important;
+                border-left-width: 3px;
+            }
+            .f1-font {
+                letter-spacing: 0.05em;
+            }
+            h1 { font-size: 2rem !important; }
         }
 
         .option-btn {
@@ -62,11 +88,6 @@
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
         }
         
-        .speaking {
-            color: #e10600;
-            transform: scale(1.1);
-        }
-
         .pit-btn {
             background: repeating-linear-gradient(
               45deg,
@@ -82,19 +103,11 @@
             70% { box-shadow: 0 0 0 10px rgba(225, 6, 0, 0); }
             100% { box-shadow: 0 0 0 0 rgba(225, 6, 0, 0); }
         }
-
-        /* Gate Screen Animation */
-        
-        @keyframes scan {
-            0% { top: 0%; opacity: 0; }
-            50% { opacity: 1; }
-            100% { top: 100%; opacity: 0; }
-        }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]">
+<body class="min-h-screen flex items-start justify-center md:items-center bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]">
 
-    <div id="app" class="w-full max-w-2xl">
+    <div id="app" class="w-full max-w-lg mx-auto">
         
         <div id="gate-screen" class="race-card p-10 rounded-lg shadow-2xl text-center border border-gray-700 relative overflow-hidden">
             <h1 class="f1-font text-4xl mb-2 font-bold text-white tracking-widest">PADDOCK CLUB</h1>
@@ -163,7 +176,7 @@
                 </select>
             </div>
 
-            <button onclick="quiz.start()" class="f1-font bg-red-600 hover:bg-red-700 text-white px-12 py-4 rounded-full font-bold tracking-tighter uppercase transition-transform active:scale-95 shadow-lg shadow-red-900/50 mb-8">
+            <button onclick="quiz.start()" class="w-full f1-font bg-red-600 hover:bg-red-700 text-white py-5 rounded-lg font-bold tracking-widest uppercase transition-transform active:scale-95 shadow-lg shadow-red-900/50 mb-8 text-xl">
                 Start Engine
             </button>
 
@@ -174,14 +187,15 @@
                     <label class="text-[10px] text-gray-500 uppercase tracking-widest block mb-1">QUICK SEARCH (WORD / MEANING)</label>
                     <div class="flex items-center relative">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500 absolute left-3 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                    <input type="text" id="search-input" placeholder="Type to scan database..." class="w-full bg-black text-white py-2 pl-9 pr-2 rounded border border-gray-700 focus:border-red-500 outline-none font-mono text-base placeholder-gray-700 transition-colors">
+                        <input type="text" id="search-input" placeholder="Type to scan database..." class="w-full bg-black text-white py-2 pl-9 pr-2 rounded border border-gray-700 focus:border-red-500 outline-none font-mono text-base placeholder-gray-700 transition-colors">
+                    </div>
                     <div id="search-results" class="hidden absolute z-50 left-0 w-full mt-1 bg-gray-900 border border-gray-700 rounded shadow-2xl max-h-60 overflow-y-auto"></div>
                 </div>
 
                 <div class="bg-gray-800/50 p-4 rounded border border-gray-600 text-left">
                     <label class="text-xs text-gray-400 uppercase tracking-widest block mb-2">CUSTOM TEST RANGE (WORD #)</label>
                     <div class="flex gap-2 items-center">
-                       <input type="number" id="custom-start" placeholder="1" class="w-1/4 bg-black text-white p-2 rounded border border-gray-700 focus:border-red-500 outline-none text-center font-mono text-base placeholder-gray-600">
+                        <input type="number" id="custom-start" placeholder="1" class="w-1/4 bg-black text-white p-2 rounded border border-gray-700 focus:border-red-500 outline-none text-center font-mono text-base placeholder-gray-600">
                         <span class="text-gray-500 font-bold">-</span>
                         <input type="number" id="custom-end" placeholder="50" class="w-1/4 bg-black text-white p-2 rounded border border-gray-700 focus:border-red-500 outline-none text-center font-mono text-base placeholder-gray-600">
                         <button onclick="quiz.createCustomRound()" class="flex-1 f1-font bg-gray-700 hover:bg-yellow-500 hover:text-black text-white text-xs font-bold uppercase rounded py-2 transition-colors border border-gray-600">
@@ -214,7 +228,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div id="quiz-screen" class="hidden race-card p-6 rounded-lg shadow-2xl">
             <div class="flex justify-between items-center mb-4">
                 <div class="flex flex-col text-left max-w-[60%]">
@@ -2342,7 +2356,7 @@ lest: ～しないように
                 this.parseData();
                 this.generateRounds();
                 this.initUI();
-                this.initSearch(); 
+                this.initSearch();
             }
 
             loadVoices() {
@@ -2378,9 +2392,6 @@ lest: ～しないように
                         if(w && m) this.masterList.push({ w, m });
                     }
                 });
-                const countDisplay = document.getElementById('total-words-count');
-                if(countDisplay) countDisplay.innerText = this.masterList.length;
-                console.log("Telemetry: Loaded " + this.masterList.length + " words.");
             }
 
             generateRounds() {
@@ -2459,6 +2470,7 @@ lest: ～しないように
                     selector.appendChild(opt);
                 });
             }
+
             initSearch() {
                 const input = document.getElementById('search-input');
                 const results = document.getElementById('search-results');
@@ -2496,14 +2508,15 @@ lest: ～しないように
                         results.innerHTML = `<div class="p-3 text-gray-500 text-xs text-center font-mono">NO DATA FOUND</div>`;
                     }
                 });
- // Hide results when clicking outside
+
+                // Hide results when clicking outside
                 document.addEventListener('click', (e) => {
                     if (!input.contains(e.target) && !results.contains(e.target)) {
                         results.classList.add('hidden');
                     }
                 });
             }
-            
+
             copyToClipboard(text, btnElement) {
                 navigator.clipboard.writeText(text).then(() => {
                     const originalText = btnElement.innerText;
@@ -2515,6 +2528,7 @@ lest: ～しないように
                     }, 2000);
                 });
             }
+
             speak(text) {
                 if (!this.synth) return;
                 this.synth.cancel();
@@ -2655,7 +2669,7 @@ lest: ～しないように
                         failMsg.classList.add('hidden');
                         
                         // ID生成
-                        const licenseId = `perfect`;
+                        const licenseId = `LICENSE-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
                         const passBtn = document.getElementById('copy-pass-btn');
 
                         // A. 手動コピー設定 (Backup)
@@ -2806,7 +2820,7 @@ lest: ～しないように
         const mistakesRef = collection(db, "users", window.currentUser.uid, "mistakes");
         const now = new Date();
 
-        // ★ID生成ロジック修正版
+        // ★ID生成ロジック修正版 (Safe ID)
         const safeWordId = btoa(encodeURIComponent(questionObj.w)).replace(/\//g, '_').replace(/\+/g, '-');
         const docRef = doc(mistakesRef, safeWordId);
 
